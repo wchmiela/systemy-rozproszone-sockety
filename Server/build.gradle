@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+dependencies {}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+run {
+    mainClassName = 'ServerApp'
+    args = ["9002"]
+    standardInput = System.in
+}
