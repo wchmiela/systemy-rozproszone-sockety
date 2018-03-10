@@ -9,8 +9,8 @@ import java.time.ZonedDateTime;
 
 public class ClientHandler implements Runnable {
 
-    Server server;
-    Client client;
+    private final Server server;
+    private final Client client;
 
     ClientHandler(Server server, Client client) {
         this.server = server;
@@ -21,28 +21,15 @@ public class ClientHandler implements Runnable {
     public void run() {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()));
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(client.getSocket().getOutputStream()));
-
-            String clientMessage = null;
+            String clientMessage;
 
             while ((clientMessage = in.readLine()) != null) {
-                Instant now = Instant.now();
-                ZoneId zoneId = ZoneId.of("Europe/Warsaw");
-                ZonedDateTime dateAndTimeInKrakow = ZonedDateTime.ofInstant(now, zoneId);
+                MessageFormatter formatter = new MessageFormatter(clientMessage, client.getName());
+                String formatedMessage = formatter.getMessage();
+                System.out.println(formatedMessage);
 
-                String log = String.format("[%d:%d:%d]\t%s>%s", dateAndTimeInKrakow.getHour(),
-                        dateAndTimeInKrakow.getMinute(), dateAndTimeInKrakow.getSecond(), client.getName(),
-                        clientMessage);
-
-                System.out.println(log);
-                this.server.sendMessage(client, clientMessage);
-
-                // String clientLog = String.format("%s : %s\n", client.getName(), clientMessage);
-                // out.write(clientLog);
-                // out.newLine();
-                // out.flush();
+                server.sendMessage(client, String.format("%s#%s", client.getName(), clientMessage));
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }

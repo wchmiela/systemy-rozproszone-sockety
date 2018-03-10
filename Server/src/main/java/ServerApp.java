@@ -13,7 +13,7 @@ public class ServerApp {
 
         Server server = new Server(port);
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(server);
     }
 }

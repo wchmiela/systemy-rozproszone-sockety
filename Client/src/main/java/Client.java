@@ -3,14 +3,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class Client implements Runnable{
+public class Client implements Runnable {
 
     private String address;
     private int port;
+    private Socket clientSocket = null;
 
-    Client(String clientAddress, int clientPort){
+    Client(String clientAddress, int clientPort) {
         this.address = clientAddress;
         this.port = clientPort;
 
@@ -18,9 +20,8 @@ public class Client implements Runnable{
         System.out.println(message);
     }
 
-	@Override
-	public void run() {
-		Socket clientSocket = null;
+    @Override
+    public void run() {
         try {
             clientSocket = new Socket(address, port);
 
@@ -28,16 +29,11 @@ public class Client implements Runnable{
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
-            while (true) {
-                String userInput;
-                while ((userInput = stdIn.readLine()) != null) {
-                    out.println(userInput);                  
-                }
-            }
+            ExecutorService ex = Executors.newCachedThreadPool();
+            ex.execute(new Writer(out, stdIn));
+            ex.execute(new Reader(in));
 
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            System.exit(1);
+            while (true) ;
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -49,5 +45,6 @@ public class Client implements Runnable{
                     e.printStackTrace();
                 }
         }
-	}
+    }
+
 }
