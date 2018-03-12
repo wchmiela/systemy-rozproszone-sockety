@@ -48,7 +48,7 @@ public class Writer implements Runnable {
                         }
 
                         if (userInput.equals("exit")) {
-                            System.exit(1);
+                            System.exit(0);
                         }
                     }
                 }

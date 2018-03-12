@@ -18,9 +18,9 @@ public class UDPClientHandler implements Runnable {
             byte[] receiveBuffer = new byte[1024];
 
             while (true) {
-
                 Arrays.fill(receiveBuffer, (byte) 0);
                 DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+
                 server.getUdpServerSocket().receive(receivePacket);
 
                 String clientMessage = new String(receivePacket.getData()).trim();

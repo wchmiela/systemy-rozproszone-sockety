@@ -34,7 +34,6 @@ public class Client {
 
     public void writeUDPMessage(String message) {
         byte[] sendBuffer = message.getBytes();
-
         try {
             DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length, socket.getInetAddress(), socket.getPort());
             server.getUdpServerSocket().send(sendPacket);
@@ -49,5 +48,9 @@ public class Client {
 
     public BufferedReader getIn() {
         return in;
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 }

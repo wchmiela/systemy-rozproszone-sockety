@@ -1,4 +1,3 @@
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
@@ -12,19 +11,23 @@ import java.util.stream.Collectors;
 
 public class Server implements Runnable {
 
-    private Set<Client> clients = Collections.newSetFromMap(new ConcurrentHashMap<>());
-
     private static int clientsCount = 0;
-
+    private static final int LIMIT = 100;
     private final int port;
-
     private DatagramSocket udpServerSocket;
+    private Set<Client> clients = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     Server(int serverPort) {
         this.port = serverPort;
 
         String message = String.format("TCP Server. Port: %d", port);
         System.out.println(message);
+
+        try {
+            udpServerSocket = new DatagramSocket(port);
+        } catch (IOException e) {
+            System.out.println("Blad w utworzeniu socketa udp " + e.getMessage());
+        }
     }
 
     @Override
@@ -34,13 +37,7 @@ public class Server implements Runnable {
         ExecutorService executor = null;
         ServerSocket serverSocket = null;
 
-        try {
-            udpServerSocket = new DatagramSocket(port);
-        } catch (IOException e) {
-            System.out.println("Blad w utworzeniu socketa udp " + e.getMessage());
-        }
-
-        while (true) {
+        while (clients.size() < LIMIT) {
             try {
                 serverSocket = new ServerSocket(port);
 

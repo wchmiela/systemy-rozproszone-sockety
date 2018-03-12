@@ -21,7 +21,6 @@ public class ClientHandler implements Runnable {
                 if (clientMessage.equals("exit")) {
                     server.removeClient(client);
                 } else {
-
                     MessageFormatter formatter = new MessageFormatter(clientMessage, client.getName());
                     String formatedMessage = formatter.getMessage();
                     System.out.println(formatedMessage);
