@@ -11,13 +11,13 @@ import java.util.Random;
 
 public class Writer implements Runnable {
 
-    private Client client;
+    private final Client client;
     private final PrintWriter out;
     private final BufferedReader stdIn;
-    private boolean udp = false;
     private final DatagramSocket socket;
+    private boolean UDPMessage = false;
 
-    public Writer(Client client, PrintWriter out, BufferedReader stdIn, DatagramSocket socket) {
+    Writer(Client client, PrintWriter out, BufferedReader stdIn, DatagramSocket socket) {
         this.client = client;
         this.out = out;
         this.stdIn = stdIn;
@@ -34,30 +34,17 @@ public class Writer implements Runnable {
                     if (userInput.length() == 1 && (userInput.startsWith("U") || userInput.startsWith("T"))) {
                         switch (userInput) {
                             case "U":
-                                udp = true;
+                                UDPMessage = true;
                                 break;
                             default:
-                                udp = false;
+                                UDPMessage = false;
                                 break;
                         }
                     } else {
-                        if (udp) {
-                            byte[] sendBuffer;
-                            if (userInput.equals("ascii")) {
-                                if (new Random().nextInt() % 2 == 0) {
-                                    sendBuffer = new AsciiArtSword().getArt().getBytes();
-                                } else {
-                                    sendBuffer = new AsciiArtAnimal().getArt().getBytes();
-                                }
-                            } else {
-                                sendBuffer = userInput.getBytes();
-                            }
-
-                            DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length,
-                                    InetAddress.getByName(client.getAddress()), client.getPort());
-                            socket.send(sendPacket);
+                        if (UDPMessage) {
+                            sendUDP(userInput);
                         } else {
-                            if (userInput.length() > 0) out.println(userInput);
+                            sendTCP(userInput);
                         }
 
                         if (userInput.equals("exit")) {
@@ -67,7 +54,35 @@ public class Writer implements Runnable {
                 }
             }
         } catch (IOException e) {
-            System.out.println("problemo");
+            System.out.println("Blad w wyslaniu wiaodmosci od kleinta" + e.getMessage());
         }
+    }
+
+    private void sendTCP(String message) {
+        if (message.length() > 0)
+            out.println(message);
+    }
+
+    private void sendUDP(String message) throws IOException {
+        byte[] sendBuffer;
+        if (message.equals("ascii")) {
+            sendBuffer = sendAscii();
+        } else {
+            sendBuffer = message.getBytes();
+        }
+
+        DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length,
+                InetAddress.getByName(client.getAddress()), client.getPort());
+        socket.send(sendPacket);
+    }
+
+    private byte[] sendAscii() {
+        byte[] sendBuffer;
+        if (new Random().nextInt() % 2 == 0) {
+            sendBuffer = new AsciiArtSword().getArt().getBytes();
+        } else {
+            sendBuffer = new AsciiArtAnimal().getArt().getBytes();
+        }
+        return sendBuffer;
     }
 }

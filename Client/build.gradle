@@ -15,7 +15,7 @@ repositories {
 
 run {
     mainClassName = 'ClientApp'
-    args = ["localhost","9002"]
+    args = ["localhost","9003"]
     standardInput = System.in    
 }
 

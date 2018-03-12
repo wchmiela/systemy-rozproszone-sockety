@@ -37,7 +37,7 @@ public class UDPClientHandler implements Runnable {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Blad w dzialaniu handleraUDP " + e.getMessage());
         }
     }
 }

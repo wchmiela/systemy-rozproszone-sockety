@@ -3,11 +3,9 @@ import java.io.IOException;
 
 public class Reader implements Runnable {
 
-    private Client client;
     private final BufferedReader in;
 
-    Reader(Client client, BufferedReader in) {
-        this.client = client;
+    Reader(BufferedReader in) {
         this.in = in;
     }
 
@@ -15,11 +13,9 @@ public class Reader implements Runnable {
     public void run() {
         try {
             String clientMessage;
-            while (true) {
+            do {
                 clientMessage = in.readLine();
-
                 if (clientMessage != null) {
-
                     String clientName = clientMessage.split("#")[0];
                     String message = clientMessage.split("#")[1];
                     MessageFormatter formatter = new MessageFormatter(message, clientName);
@@ -27,9 +23,9 @@ public class Reader implements Runnable {
 
                     System.out.println(formatedMessage);
                 }
-            }
+            } while (true);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Blad w odbiorze wiadomosci tcp " + e.getMessage());
         }
     }
 }

@@ -1,11 +1,5 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 public class ClientHandler implements Runnable {
 
@@ -20,18 +14,23 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()));
+            BufferedReader in = client.getIn();
             String clientMessage;
 
             while ((clientMessage = in.readLine()) != null) {
-                MessageFormatter formatter = new MessageFormatter(clientMessage, client.getName());
-                String formatedMessage = formatter.getMessage();
-                System.out.println(formatedMessage);
+                if (clientMessage.equals("exit")) {
+                    server.removeClient(client);
+                } else {
 
-                server.sendMessage(client, String.format("%s#%s", client.getName(), clientMessage));
+                    MessageFormatter formatter = new MessageFormatter(clientMessage, client.getName());
+                    String formatedMessage = formatter.getMessage();
+                    System.out.println(formatedMessage);
+
+                    server.sendMessage(client, String.format("%s#%s", client.getName(), clientMessage));
+                }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Blad w dzialaniu handlera " + e.getMessage());
         }
     }
 }

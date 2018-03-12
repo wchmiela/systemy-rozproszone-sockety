@@ -7,7 +7,7 @@ public class MessageFormatter {
     private final String receivedMessage;
     private final String clientName;
 
-    public MessageFormatter(String receivedMessage, String clientName) {
+    MessageFormatter(String receivedMessage, String clientName) {
         this.receivedMessage = receivedMessage;
         this.clientName = clientName;
     }

@@ -9,8 +9,8 @@ import java.util.concurrent.Executors;
 
 public class Client implements Runnable {
 
-    private String address;
-    private int port;
+    private final String address;
+    private final int port;
     private Socket clientSocket;
     private DatagramSocket clientDatagramSocket;
 
@@ -26,7 +26,7 @@ public class Client implements Runnable {
     public void run() {
         try {
             clientSocket = new Socket(address, port);
-            clientDatagramSocket = new DatagramSocket(clientSocket.getLocalPort()); //dlaczego tutaj localport?
+            clientDatagramSocket = new DatagramSocket(clientSocket.getLocalPort());
 
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -34,22 +34,22 @@ public class Client implements Runnable {
 
             ExecutorService ex = Executors.newCachedThreadPool();
             Runnable writer = new Writer(this, out, stdIn, clientDatagramSocket);
-            Runnable reader = new Reader(this, in);
-            Runnable udpReader = new UDPReader(this, clientDatagramSocket);
+            Runnable reader = new Reader(in);
+            Runnable udpReader = new UDPReader(clientDatagramSocket);
             ex.execute(writer);
             ex.execute(reader);
             ex.execute(udpReader);
 
             while(true);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Blad w tworzeniu socketow klienta " + e.getMessage());
             System.exit(1);
         } finally {
             if (clientSocket != null) {
                 try {
                     clientSocket.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.out.println("Blad w zamknieciu socketa " + e.getMessage());
                 }
             }
             if (clientDatagramSocket != null) {
